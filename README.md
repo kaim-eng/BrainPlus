@@ -2,6 +2,8 @@
 
 Your AI-powered knowledge assistant - A privacy-first browser extension that captures and organizes your browsing history using ML embeddings for semantic search, local RAG, and Ask Me Anything capabilities.
 
+**🔐 Your data never leaves your device.** All browsing history, page content, and ML embeddings stay 100% local in your browser.
+
 ## 🎬 Demo
 
 ![BrainPlus Demo](demo.gif)
@@ -15,14 +17,15 @@ This is a monorepo containing:
 
 ## 🎯 Key Features
 
-- **Ask Me Anything (AMA)**: Query your browsing history with natural language
-- **Local RAG**: Retrieval-Augmented Generation with passage-level semantic search
-- **Semantic Search**: Find pages by meaning, not just keywords
-- **Local-First Storage**: All your browsing history stays on your device in IndexedDB
-- **ML-Powered Embeddings**: 512-dimensional vectors using Universal Sentence Encoder
-- **Privacy-First**: Denylist protection for 75+ sensitive domains (banking, healthcare, email)
-- **Smart Chunking**: Sentence-aware passage generation for long documents
-- **Quality Eviction**: Intelligent storage management based on recency, intent, and access patterns
+- **🔒 100% Local & Private**: Your data never leaves your device - all processing happens in your browser
+- **🤖 Ask Me Anything (AMA)**: Query your browsing history with natural language
+- **🧠 Local RAG**: Retrieval-Augmented Generation with passage-level semantic search
+- **🔍 Semantic Search**: Find pages by meaning, not just keywords
+- **💾 Local-First Storage**: All browsing history stays on your device in IndexedDB
+- **🎯 ML-Powered Embeddings**: 512-dimensional vectors using Universal Sentence Encoder (runs locally)
+- **🛡️ Privacy-First**: Denylist protection for 75+ sensitive domains (banking, healthcare, email)
+- **📝 Smart Chunking**: Sentence-aware passage generation for long documents
+- **🗑️ Quality Eviction**: Intelligent storage management based on recency, intent, and access patterns
 
 ## 🚀 Quick Start
 
@@ -53,11 +56,17 @@ uvicorn app.main:app --reload
 
 ## 🔒 Privacy & Security
 
-- **Local-First**: All page content and embeddings stored on your device
-- **No Tracking**: Page digests never leave your browser
-- **Differential Privacy**: Aggregated signals use Laplace noise
-- **Encrypted Storage**: AES-GCM encryption for sensitive data
-- **No PII**: Only anonymous IDs and aggregated interests
+**Your Data Never Leaves Your Device:**
+- ✅ **100% Local Storage**: All browsing history, page content, and ML embeddings stay on your device in IndexedDB
+- ✅ **Zero Data Collection**: We never see, store, or have access to your browsing data
+- ✅ **No Cloud Sync**: Your personal knowledge base is yours alone
+- ✅ **Offline-First**: Full functionality without internet connection (except optional deals feature)
+
+**Additional Privacy Protections:**
+- 🛡️ **Smart Denylist**: Automatically blocks scraping of 75+ sensitive domains (banking, healthcare, email, government)
+- 🔐 **Encrypted Storage**: AES-GCM encryption for sensitive data
+- 🎭 **Differential Privacy**: Optional aggregated signals (for deals) use Laplace noise and k-anonymity
+- 🚫 **No PII**: Only anonymous IDs if you choose to use the optional deals feature
 
 ## 📦 Tech Stack
 
