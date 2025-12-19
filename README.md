@@ -108,7 +108,16 @@ pytest --brave     # Brave-specific test suite
 
 ## 📄 License
 
-MIT License - Open Source
+GNU Affero General Public License v3.0 (AGPL-3.0)
+
+This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+
+**Key Points:**
+- ✅ Free to use, modify, and distribute
+- ✅ Must disclose source code of modifications
+- ✅ Network use is considered distribution (SaaS clause)
+- ✅ Derivatives must also use AGPL-3.0
+- ✅ Protects user freedom and privacy
 
 ## 🤝 Contributing
 
