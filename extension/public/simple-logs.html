@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Logs - SecondBrain</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    pre { background: #2d2d30; padding: 10px; overflow-x: auto; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Extension Logs</h1>
+  <button onclick="showLogs()">Show Logs</button>
+  <button onclick="exportLogs()">Export to File</button>
+  <button onclick="copyLogs()">Copy to Clipboard</button>
+  <button onclick="clearLogs()">Clear All</button>
+  <pre id="output">Click "Show Logs" to view...</pre>
+  
+  <script>
+    async function showLogs() {
+      const result = await chrome.storage.local.get('debug_logs');
+      const logs = result.debug_logs || [];
+      const output = document.getElementById('output');
+      
+      if (logs.length === 0) {
+        output.textContent = 'No logs found. Make sure you are using logger in your code.';
+        return;
+      }
+      
+      output.textContent = formatLogs(logs);
+    }
+    
+    function formatLogs(logs) {
+      return logs.map(log => {
+        let text = `[${log.timestamp}] [${log.context}] [${log.level}] ${log.message}`;
+        if (log.data) text += `\nData: ${JSON.stringify(log.data, null, 2)}`;
+        if (log.stack) text += `\nStack: ${log.stack}`;
+        return text;
+      }).join('\n\n---\n\n');
+    }
+    
+    async function exportLogs() {
+      const result = await chrome.storage.local.get('debug_logs');
+      const logs = result.debug_logs || [];
+      const text = formatLogs(logs);
+      
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `extension-logs-${Date.now()}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      alert('Logs exported!');
+    }
+    
+    async function copyLogs() {
+      const result = await chrome.storage.local.get('debug_logs');
+      const logs = result.debug_logs || [];
+      const text = formatLogs(logs);
+      await navigator.clipboard.writeText(text);
+      alert('Logs copied to clipboard!');
+    }
+    
+    async function clearLogs() {
+      if (confirm('Clear all logs?')) {
+        await chrome.storage.local.remove('debug_logs');
+        document.getElementById('output').textContent = 'Logs cleared.';
+      }
+    }
+    
+    // Auto-load on page open
+    showLogs();
+  </script>
+</body>
+</html>
+

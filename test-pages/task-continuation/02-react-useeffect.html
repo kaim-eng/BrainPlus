@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Task Continuation - useEffect Hook</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #61dafb; }
+        .content {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        code {
+            background: #282c34;
+            color: #61dafb;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .keyword {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 React useEffect Hook Guide</h1>
+    
+    <div class="content">
+        <h2>What is useEffect?</h2>
+        <p>The <span class="keyword">useEffect</span> hook is used for side effects in <span class="keyword">React</span> 
+        functional components. It's similar to componentDidMount, componentDidUpdate, and componentWillUnmount combined.</p>
+        
+        <pre><code>
+useEffect(() => {
+  // Your side effect here
+  console.log('Effect runs!');
+  
+  return () => {
+    // Cleanup function
+  };
+}, [dependencies]);
+        </code></pre>
+        
+        <h2>Dependency Array</h2>
+        <p>The second argument to <span class="keyword">useEffect</span> controls when your effect runs:</p>
+        <ul>
+            <li><code>[]</code> - Runs once on mount (like componentDidMount)</li>
+            <li><code>[dep1, dep2]</code> - Runs when dependencies change</li>
+            <li>No array - Runs after every render</li>
+        </ul>
+    </div>
+    
+    <div class="content">
+        <h2>Common useEffect Patterns in React</h2>
+        <p>Use <span class="keyword">useEffect</span> for:</p>
+        <ol>
+            <li>Fetching data from APIs in <span class="keyword">React</span></li>
+            <li>Setting up subscriptions in <span class="keyword">React</span> components</li>
+            <li>Manually changing the DOM in <span class="keyword">React</span></li>
+            <li>Setting up timers in <span class="keyword">React</span></li>
+        </ol>
+        
+        <p>The <span class="keyword">useEffect</span> hook integrates perfectly with <span class="keyword">useState</span> 
+        and other <span class="keyword">React hooks</span>.</p>
+    </div>
+    
+    <div class="content">
+        <h2>Cleanup Functions</h2>
+        <p>Always clean up subscriptions, timers, and event listeners in <span class="keyword">React useEffect</span> 
+        to prevent memory leaks in your <span class="keyword">React</span> application.</p>
+        
+        <pre><code>
+useEffect(() => {
+  const subscription = api.subscribe();
+  
+  return () => subscription.unsubscribe();
+}, []);
+        </code></pre>
+    </div>
+    
+    <script>
+        console.log('React useEffect tutorial loaded - learning hooks');
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Understanding React hooks: useEffect, dependencies, cleanup functions');
+        });
+    </script>
+</body>
+</html>
+

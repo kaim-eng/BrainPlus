@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Task Continuation - React Context API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #61dafb; }
+        .content {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        code {
+            background: #282c34;
+            color: #61dafb;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .keyword {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>⚛️ React Context API Tutorial</h1>
+    
+    <div class="content">
+        <h2>What is React Context?</h2>
+        <p>The <span class="keyword">React Context API</span> provides a way to pass data through the component tree 
+        without having to pass props down manually at every level. It's built into <span class="keyword">React</span>.</p>
+        
+        <pre><code>
+const ThemeContext = React.createContext('light');
+
+function App() {
+  return (
+    &lt;ThemeContext.Provider value="dark"&gt;
+      &lt;Toolbar /&gt;
+    &lt;/ThemeContext.Provider&gt;
+  );
+}
+        </code></pre>
+        
+        <h2>When to Use Context</h2>
+        <p>Use <span class="keyword">React Context</span> when you need to share data across many components:</p>
+        <ul>
+            <li>Theme preferences in your <span class="keyword">React</span> app</li>
+            <li>User authentication state in <span class="keyword">React</span></li>
+            <li>Language/locale settings in <span class="keyword">React</span></li>
+            <li>Global UI state in <span class="keyword">React</span> applications</li>
+        </ul>
+    </div>
+    
+    <div class="content">
+        <h2>Using Context with Hooks</h2>
+        <p>The <span class="keyword">useContext</span> hook makes consuming context in <span class="keyword">React</span> 
+        functional components super easy:</p>
+        
+        <pre><code>
+const theme = useContext(ThemeContext);
+        </code></pre>
+        
+        <p>This <span class="keyword">React hook</span> works seamlessly with <span class="keyword">useState</span>, 
+        <span class="keyword">useEffect</span>, and other <span class="keyword">hooks</span>.</p>
+    </div>
+    
+    <div class="content">
+        <h2>Context Best Practices in React</h2>
+        <p>When using <span class="keyword">React Context</span>:</p>
+        <ol>
+            <li>Don't use context just to avoid passing props a few levels</li>
+            <li>Split contexts by domain in your <span class="keyword">React</span> app</li>
+            <li>Use Context.Provider at appropriate levels in <span class="keyword">React</span></li>
+            <li>Consider combining with <span class="keyword">useReducer</span> for complex state</li>
+        </ol>
+        
+        <p>The <span class="keyword">Context API</span> is a powerful feature of <span class="keyword">React</span> 
+        for managing global state without external libraries.</p>
+    </div>
+    
+    <div class="content">
+        <h2>Context vs Redux</h2>
+        <p>While Redux is still popular, <span class="keyword">React Context</span> combined with 
+        <span class="keyword">hooks</span> can handle many state management needs in modern <span class="keyword">React</span> applications.</p>
+        
+        <p>The <span class="keyword">React</span> team recommends using Context for data that needs to be accessible 
+        by many components at different nesting levels.</p>
+    </div>
+    
+    <script>
+        console.log('React Context API tutorial loaded - advanced hooks');
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Learning React: Context, useContext, global state management');
+        });
+    </script>
+</body>
+</html>
+

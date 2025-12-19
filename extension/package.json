@@ -1,0 +1,39 @@
+{
+  "name": "brainplus",
+  "version": "1.0.0",
+  "description": "BrainPlus - Your AI-powered knowledge assistant with local RAG and semantic search",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && vite build --config vite.config.content.ts",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "type-check": "tsc --noEmit",
+    "watch-logs": "node scripts/log-watcher.cjs",
+    "watch-logs:ps1": "powershell -ExecutionPolicy Bypass -File scripts/log-watcher.ps1"
+  },
+  "dependencies": {
+    "@tensorflow-models/universal-sentence-encoder": "^1.3.3",
+    "@tensorflow/tfjs": "^4.22.0",
+    "idb": "^8.0.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "stopword": "^3.1.5"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.256",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@types/stopword": "^2.0.3",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8",
+    "vite-plugin-static-copy": "^1.0.0",
+    "ws": "^8.18.0"
+  }
+}
