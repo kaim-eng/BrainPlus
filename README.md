@@ -2,6 +2,10 @@
 
 Your AI-powered knowledge assistant - A privacy-first browser extension that captures and organizes your browsing history using ML embeddings for semantic search, local RAG, and Ask Me Anything capabilities.
 
+## 🎬 Demo
+
+![BrainPlus Demo](demo.gif)
+
 ## 🏗️ Architecture
 
 This is a monorepo containing:
