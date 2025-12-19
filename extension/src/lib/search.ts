@@ -365,7 +365,6 @@ export async function retrievePassages(
   query: string,
   topK: number = 12
 ): Promise<RankedPassage[]> {
-  
   const startTime = performance.now();
   const now = Date.now();
   
@@ -407,14 +406,10 @@ export async function retrievePassages(
  */
 async function getQueryEmbedding(query: string): Promise<Float32Array> {
   try {
-    console.log('[Search] Requesting query embedding for:', query);
-    
     const response = await chrome.runtime.sendMessage({
       type: 'EMBED_QUERY',
       data: { query }
     });
-    
-    console.log('[Search] Embedding response:', response);
     
     if (!response) {
       throw new Error('No response from offscreen worker. Worker may not be running.');

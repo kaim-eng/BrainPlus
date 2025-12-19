@@ -18,7 +18,7 @@ import type { PageDigest, Passage } from './types';
 // ============================================================================
 
 const MIN_TEXT_LENGTH = 2000;        // Min chars to chunk (otherwise use page-level)
-const MIN_INTENT_SCORE = 0.6;        // Min intent score to chunk
+const MIN_INTENT_SCORE = 0.5;        // Min intent score to chunk (matches fullText storage threshold)
 const TARGET_CHUNK_SIZE = 3000;      // Target chars per chunk (~750 tokens)
 const MAX_CHUNK_SIZE = 4000;         // Max chars per chunk (~1000 tokens)
 const OVERLAP_SIZE = 500;            // Overlap chars (~125 tokens)

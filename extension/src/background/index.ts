@@ -15,6 +15,7 @@ import { syncDealsJob, syncPointsJob } from './jobs';
 import { initializeExtension } from './init';
 import { STORAGE_CONFIG } from '@/lib/constants';
 import { checkForResumableSessions } from './handlers/sessionHandler';
+import { handleAMAQuery } from './handlers/amaHandler';
 
 // ============================================================================
 // Service Worker Lifecycle
@@ -63,21 +64,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // ============================================================================
 
 chrome.runtime.onConnect.addListener((port) => {
-  console.log('[Background] Port connected:', port.name);
-  
   if (port.name === 'ama-stream') {
     // Handle AMA streaming connection
     port.onMessage.addListener(async (message) => {
-      console.log('[Background] AMA port message:', message.type);
-      
       if (message.type === 'AMA_QUERY') {
-        const { handleAMAQuery } = await import('./handlers/amaHandler');
-        await handleAMAQuery(message, port);
+        try {
+          await handleAMAQuery(message, port);
+        } catch (error) {
+          console.error('[Background] AMA error:', error);
+          // Send error to frontend
+          port.postMessage({
+            type: 'AMA_ERROR',
+            error: error instanceof Error ? error.message : String(error),
+            requestId: `ama-${Date.now()}`,
+            timestamp: Date.now(),
+          });
+        }
       }
-    });
-    
-    port.onDisconnect.addListener(() => {
-      console.log('[Background] AMA port disconnected');
     });
   }
 });

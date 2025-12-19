@@ -14,6 +14,7 @@
  */
 
 import { retrievePassages } from '@/lib/search';
+import { ensureOffscreenDocument } from '../offscreenManager';
 import type { 
   AMAQueryMessage, 
   AMASourcesMessage, 
@@ -145,7 +146,6 @@ export async function handleAMAQuery(
   message: AMAQueryMessage,
   port?: chrome.runtime.Port
 ): Promise<void> {
-  
   const startTime = performance.now();
   const requestId = `ama-${Date.now()}`;
   
@@ -153,6 +153,11 @@ export async function handleAMAQuery(
     console.log('[AMA] Processing query:', message.query);
     
     const maxSources = message.maxSources || DEFAULT_MAX_SOURCES;
+    
+    // 0. Ensure offscreen document is ready for embeddings
+    await ensureOffscreenDocument();
+    // Give offscreen document time to initialize and register message listeners
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     // 1. Retrieve relevant passages
     const retrievalStart = performance.now();

@@ -3,8 +3,9 @@
  * Implements "spawn-process-close" batching pattern for memory efficiency
  */
 
-import type { PageFeatures, PageDigest, InferenceResultMessage } from '@/lib/types';
+import type { PageFeatures, PageDigest, InferenceResultMessage, Passage } from '@/lib/types';
 import { db, generateUrlHash, generateDomainHash } from '@/lib/db';
+import { generatePassages } from '@/lib/chunker';
 
 // ============================================================================
 // Batching Configuration
@@ -212,7 +213,9 @@ async function processPage(page: QueuedPage): Promise<void> {
       url: page.url, // ⭐ v3: Store URL for session resumption
       title: page.title.slice(0, 200), // Max 200 chars
       summary,
-      fullText: page.text.length > 10000 ? undefined : page.text, // Only store if <10K chars
+      // Store fullText for pages that might be chunked (high-intent pages)
+      // or for pages that are reasonably sized
+      fullText: (page.text.length <= 50000 && intentScore >= 0.5) ? page.text : undefined,
       vectorBuf: vectorArray.buffer.slice(0) as ArrayBuffer, // Store as ArrayBuffer
       vector: vectorArray, // Runtime use
       entities,
@@ -228,6 +231,36 @@ async function processPage(page: QueuedPage): Promise<void> {
 
     // Save to IndexedDB
     await db.saveDigest(digest);
+
+    // Generate and save passages (for AMA/RAG)
+    const passagesWithoutEmbeddings = generatePassages(digest);
+    
+    if (passagesWithoutEmbeddings.length > 0) {
+      // Generate embeddings for each passage
+      const passages: Passage[] = [];
+      for (const passageBase of passagesWithoutEmbeddings) {
+        // Get embedding for this passage
+        const passageEmbeddingResult = await chrome.runtime.sendMessage({
+          type: 'EMBED_QUERY',
+          data: { query: passageBase.text },
+        });
+        
+        if (passageEmbeddingResult.success) {
+          const embeddingArray = new Float32Array(passageEmbeddingResult.data.vector);
+          const passage: Passage = {
+            ...passageBase,
+            embeddingBuf: embeddingArray.buffer.slice(0) as ArrayBuffer,
+            embedding: embeddingArray,
+          };
+          passages.push(passage);
+        }
+      }
+      
+      // Save all passages
+      if (passages.length > 0) {
+        await db.savePassages(passages);
+      }
+    }
 
     const processingTime = performance.now() - startTime;
     console.log(`[PageAnalysis] Saved digest in ${processingTime.toFixed(0)}ms:`, digest.urlHash.slice(0, 8));

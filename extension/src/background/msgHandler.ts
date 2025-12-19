@@ -6,7 +6,6 @@ import type { BaseMessage } from '@/lib/types';
 import { queuePageForAnalysis, processInferenceResult } from './handlers/pageAnalysis';
 import { handleFetchDeals, handleDealClick } from './handlers/deals';
 import { handleGetPoints, handleRedeemPoints } from './handlers/points';
-import { ensureOffscreenDocument } from './offscreenManager';
 
 /**
  * Route message to appropriate handler
@@ -30,27 +29,9 @@ export async function handleMessage(
     case 'INFERENCE_RESULT':
       return await processInferenceResult(message as any);
     
-    // Search query embedding (ensure offscreen exists)
-    case 'EMBED_QUERY': {
-      console.log('[MsgHandler] EMBED_QUERY received, ensuring offscreen document exists');
-      try {
-        // Ensure offscreen document is created
-        await ensureOffscreenDocument();
-        
-        // The message will be handled by the offscreen worker's listener
-        // Just return success to indicate we've ensured the offscreen exists
-        return { 
-          success: true, 
-          note: 'Offscreen document ready - please retry message' 
-        };
-      } catch (error) {
-        console.error('[MsgHandler] Failed to ensure offscreen:', error);
-        return { 
-          success: false, 
-          error: `Failed to create offscreen document: ${error instanceof Error ? error.message : String(error)}` 
-        };
-      }
-    }
+    // Search query embedding - let offscreen document handle it
+    // NOTE: EMBED_QUERY messages are handled directly by offscreen/worker-tfjs.ts
+    // We don't intercept them here, just let Chrome route them automatically
     
     // Update last accessed timestamp
     case 'UPDATE_LAST_ACCESSED': {

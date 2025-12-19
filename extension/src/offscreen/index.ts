@@ -3,20 +3,8 @@
  * Handles heavy computation: ML embeddings with TensorFlow.js
  */
 
-// Forward all console logs to background for easier debugging
-const originalLog = console.log;
-const originalWarn = console.warn;
+// Forward only errors to background for debugging
 const originalError = console.error;
-
-console.log = (...args) => {
-  originalLog(...args);
-  chrome.runtime.sendMessage({ type: 'OFFSCREEN_LOG', level: 'log', args: args.map(String) }).catch(() => {});
-};
-
-console.warn = (...args) => {
-  originalWarn(...args);
-  chrome.runtime.sendMessage({ type: 'OFFSCREEN_LOG', level: 'warn', args: args.map(String) }).catch(() => {});
-};
 
 console.error = (...args) => {
   originalError(...args);
@@ -28,5 +16,3 @@ import './worker-tfjs';
 
 // Import session clustering worker
 import './worker-sessions';
-
-console.log('[Offscreen] Document initialized with TensorFlow.js and session clustering workers');

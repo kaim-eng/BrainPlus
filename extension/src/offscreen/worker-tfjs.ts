@@ -38,7 +38,6 @@ async function embedWithCache(text: string): Promise<Float32Array> {
   // Check cache
   const cached = queryCache.get(text);
   if (cached) {
-    console.log('[Cache] Hit for query:', text.slice(0, 30));
     return cached;
   }
   
@@ -52,7 +51,6 @@ async function embedWithCache(text: string): Promise<Float32Array> {
   }
   queryCache.set(text, vector);
   
-  console.log('[Cache] Added query to cache (size:', queryCache.size, ')');
   return vector;
 }
 
@@ -79,7 +77,6 @@ async function loadModel(): Promise<void> {
   modelLoading = true;
 
   try {
-    console.log('[Worker] Loading TensorFlow.js model...');
     const startTime = performance.now();
 
     // Set backend to WebGL (best performance) - only if not already set
@@ -87,15 +84,12 @@ async function loadModel(): Promise<void> {
       await tf.setBackend('webgl');
     }
     await tf.ready();
-    
-    console.log('[Worker] TF.js backend ready:', tf.getBackend());
 
     // Load Universal Sentence Encoder
     model = await use.load();
 
     const loadTime = performance.now() - startTime;
     console.log(`[Worker] Model loaded in ${(loadTime / 1000).toFixed(2)}s`);
-    console.log(`[Worker] TF.js memory:`, tf.memory());
 
     modelLoaded = true;
     loadError = null;
@@ -194,7 +188,6 @@ async function generateEmbedding(text: string): Promise<Float32Array> {
     const truncated = text.slice(0, MAX_LENGTH * 6); // Rough: ~6 chars per token
 
     // Generate embedding
-    console.log('[Worker] Generating embedding with TF.js...');
     const embeddings = await model.embed([truncated]);
     
     // Extract as Float32Array
@@ -203,8 +196,6 @@ async function generateEmbedding(text: string): Promise<Float32Array> {
 
     // Clean up tensor
     embeddings.dispose();
-
-    console.log(`[Worker] Embedding generated (dim: ${embedding.length})`);
     
     // Verify dimensions
     if (embedding.length !== EMBEDDING_DIM) {
@@ -312,7 +303,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === 'EMBED_QUERY') {
     embedQueryHandler(message.data)
       .then(result => sendResponse({ success: true, data: result }))
-      .catch(error => sendResponse({ success: false, error: String(error) }));
+      .catch(error => {
+        console.error('[Offscreen Worker] EMBED_QUERY error:', error);
+        sendResponse({ success: false, error: String(error) });
+      });
     
     return true; // Async response
   }
@@ -328,7 +322,6 @@ async function embedQueryHandler(data: any): Promise<any> {
     throw new Error('Invalid input: query required');
   }
 
-  console.log(`[Worker] Embedding query: "${query}"`);
   const startTime = performance.now();
 
   try {
@@ -336,7 +329,6 @@ async function embedQueryHandler(data: any): Promise<any> {
     const vector = await embedWithCache(query);
 
     const processingTime = performance.now() - startTime;
-    console.log(`[Worker] Query embedding complete in ${processingTime.toFixed(1)}ms`);
 
     return {
       vector: Array.from(vector),
@@ -362,7 +354,6 @@ async function handleInference(data: any): Promise<any> {
     throw new Error('Invalid input: text required');
   }
 
-  console.log(`[Worker] Processing inference (${text.length} chars)`);
   const startTime = performance.now();
 
   try {
@@ -370,9 +361,7 @@ async function handleInference(data: any): Promise<any> {
     const vector = await generateEmbedding(text);
 
     // Extract keywords
-    console.log('[Worker] Extracting keywords...');
     const entities = extractKeywords(text);
-    console.log(`[Worker] Keywords extracted: ${entities.length} words`);
 
     // Calculate intent score (use heuristic as baseline)
     let intentScore = 0.5; // Default medium intent
@@ -389,7 +378,6 @@ async function handleInference(data: any): Promise<any> {
     }
 
     const processingTime = performance.now() - startTime;
-    console.log(`[Worker] Inference complete in ${processingTime.toFixed(1)}ms`);
 
     return {
       vector: Array.from(vector), // Convert to regular array for message passing
@@ -412,12 +400,8 @@ async function handleInference(data: any): Promise<any> {
 // Initialization
 // ============================================================================
 
-console.log('[Worker] TensorFlow.js worker started');
-console.log('[Worker] TF.js version:', tf.version.tfjs);
-
 // Pre-load model after a short delay
 setTimeout(() => {
-  console.log('[Worker] Pre-loading model...');
   loadModel().catch(err => console.error('[Worker] Pre-load failed:', err));
 }, 2000); // Wait 2s before loading
 
