@@ -55,7 +55,7 @@ The **easiest** way to get started:
 
 1. **Get your extension ID:**
    - Open `chrome://extensions`
-   - Find "SecondBrain" extension
+   - Find "BrainPlus" extension
    - Copy the ID (looks like: `abcdefghijklmnopqrstuvwxyz123456`)
 
 2. **Open the logs viewer:**

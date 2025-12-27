@@ -1,6 +1,6 @@
-# SecondBrain Extension
+# BrainPlus Extension
 
-Your AI-powered Second Brain - Chromium MV3 extension for local-first knowledge management with ML embeddings.
+Your AI-powered BrainPlus - Chromium MV3 extension for local-first knowledge management with ML embeddings.
 
 ## 🚀 Quick Start
 
@@ -102,7 +102,7 @@ extension/
 
 ### Popup UI
 - Dark theme by default (WCAG AA contrast)
-- Second Brain search interface
+- BrainPlus search interface
 - Page digest browser
 - Points dashboard (optional)
 - Settings panel
@@ -155,7 +155,7 @@ Check extension stats in the popup:
 
 ### Service Worker Console
 1. Open `chrome://extensions`
-2. Find "SecondBrain"
+2. Find "BrainPlus"
 3. Click "Inspect views: service worker"
 
 ### Content Script Console
@@ -181,7 +181,7 @@ chrome.storage.local.get(null, (items) => console.log(items));
 2. **Create ZIP**:
    ```bash
    cd dist
-   zip -r ../secondbrain-v1.0.0.zip .
+   zip -r ../brainplus-v1.0.0.zip .
    ```
 
 3. **Required files in ZIP**:

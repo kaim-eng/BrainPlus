@@ -92,7 +92,7 @@ async function fetchLogs() {
     // Find extension background page (service worker)
     const extensionTarget = targets.find(t => 
       t.type === 'service_worker' && 
-      t.title.includes('SecondBrain') || 
+      t.title.includes('BrainPlus') || 
       t.url.includes('chrome-extension://')
     );
 

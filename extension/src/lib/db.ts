@@ -1,5 +1,5 @@
 /**
- * IndexedDB Manager for "Second Brain"
+ * IndexedDB Manager for "BrainPlus"
  * Handles local storage of page digests and vector embeddings
  */
 

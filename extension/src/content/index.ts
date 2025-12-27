@@ -1,6 +1,6 @@
 /**
  * Content Script
- * Extracts features + text content for "Second Brain" indexing
+ * Extracts features + text content for "BrainPlus" indexing
  * ⚠️ SHIELDS-AWARE: No external network calls, pure DOM scraping only
  */
 

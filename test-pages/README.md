@@ -1,4 +1,4 @@
-# Test Pages for SecondBrain Extension
+# Test Pages for BrainPlus Extension
 
 This directory contains HTML test pages for manual testing of extension features.
 

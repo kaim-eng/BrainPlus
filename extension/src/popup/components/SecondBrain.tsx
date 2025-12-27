@@ -1,5 +1,5 @@
 /**
- * Second Brain Tab (v0.2)
+ * BrainPlus Tab (v0.2)
  * Shows indexed pages, interests, search, and "I Guess You Need" button
  */
 
@@ -19,7 +19,7 @@ interface InterestGroup {
   pageCount: number;
 }
 
-export const SecondBrain: React.FC = () => {
+export const BrainPlus: React.FC = () => {
   const [stats, setStats] = useState({ entryCount: 0, estimatedBytes: 0 });
   const [interests, setInterests] = useState<InterestGroup[]>([]);
   const [deals, setDeals] = useState<any[]>([]);
@@ -38,7 +38,7 @@ export const SecondBrain: React.FC = () => {
 
   // Debug: log deals state changes
   useEffect(() => {
-    console.log('[SecondBrain] deals state updated:', deals);
+    console.log('[BrainPlus] deals state updated:', deals);
   }, [deals]);
 
   // Load storage stats
@@ -49,9 +49,9 @@ export const SecondBrain: React.FC = () => {
   // Check backend health on mount and periodically
   useEffect(() => {
     const checkBackendHealth = async () => {
-      console.log('[SecondBrain] Checking backend health...');
+      console.log('[BrainPlus] Checking backend health...');
       const isHealthy = await apiClient.checkHealth();
-      console.log('[SecondBrain] Backend health:', isHealthy ? 'healthy' : 'unhealthy');
+      console.log('[BrainPlus] Backend health:', isHealthy ? 'healthy' : 'unhealthy');
       setBackendHealthy(isHealthy);
       setHealthCheckLoading(false);
     };
@@ -76,7 +76,7 @@ export const SecondBrain: React.FC = () => {
       // Load interests
       await loadInterests();
     } catch (error) {
-      console.error('[SecondBrain] Failed to load stats:', error);
+      console.error('[BrainPlus] Failed to load stats:', error);
     }
   };
 
@@ -109,7 +109,7 @@ export const SecondBrain: React.FC = () => {
 
       setInterests(interestGroups);
     } catch (error) {
-      console.error('[SecondBrain] Failed to load interests:', error);
+      console.error('[BrainPlus] Failed to load interests:', error);
     }
   };
 
@@ -172,23 +172,23 @@ export const SecondBrain: React.FC = () => {
 
       // Get anonymous ID and set it on API client
       const anonymousId = await getLocal<string>(STORAGE_KEYS.ANONYMOUS_ID);
-      console.log('[SecondBrain] Anonymous ID:', anonymousId);
+      console.log('[BrainPlus] Anonymous ID:', anonymousId);
       if (anonymousId) {
         apiClient.setAnonymousId(anonymousId);
       }
 
       // Send to backend
-      console.log('[SecondBrain] Sending signals:', signals);
+      console.log('[BrainPlus] Sending signals:', signals);
       const response = await apiClient.matchDeals(signals);
-      console.log('[SecondBrain] API response:', response);
-      console.log('[SecondBrain] response.success:', response.success);
-      console.log('[SecondBrain] response.data:', response.data);
+      console.log('[BrainPlus] API response:', response);
+      console.log('[BrainPlus] response.success:', response.success);
+      console.log('[BrainPlus] response.data:', response.data);
 
       if (response.success && response.data) {
         const matches = response.data.matches || [];
         const points = response.data.pointsEarned || 0;
-        console.log('[SecondBrain] Setting deals:', matches);
-        console.log('[SecondBrain] Setting points:', points);
+        console.log('[BrainPlus] Setting deals:', matches);
+        console.log('[BrainPlus] Setting points:', points);
         setDeals(matches);
         setPointsEarned(points);
         
@@ -197,11 +197,11 @@ export const SecondBrain: React.FC = () => {
           await db.updateSyncStatus(page.urlHash, true);
         }
       } else {
-        console.error('[SecondBrain] API error:', response);
+        console.error('[BrainPlus] API error:', response);
         alert(`Failed to get deals: ${response.error || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error('[SecondBrain] Signal generation failed:', error);
+      console.error('[BrainPlus] Signal generation failed:', error);
       alert('Failed to generate signal. Please try again.');
     } finally {
       setLoading(false);
@@ -235,13 +235,13 @@ export const SecondBrain: React.FC = () => {
     setSearchError(null);
 
     try {
-      console.log('[SecondBrain] Starting search for:', query);
+      console.log('[BrainPlus] Starting search for:', query);
       const results = await searchWithFallback(query, {
         includePrivate: false,
         limit: 20,
         minScore: 0.1
       });
-      console.log('[SecondBrain] Search results:', results.length);
+      console.log('[BrainPlus] Search results:', results.length);
       
       // Only update results after search completes
       setSearchResults(results);
@@ -250,7 +250,7 @@ export const SecondBrain: React.FC = () => {
         setSearchError(`No results found for "${query}". Try different keywords or browse more pages.`);
       }
     } catch (error) {
-      console.error('[SecondBrain] Search failed:', error);
+      console.error('[BrainPlus] Search failed:', error);
       setSearchError(`Search error: ${error instanceof Error ? error.message : String(error)}`);
       // Keep previous results on error instead of clearing
     } finally {
@@ -265,7 +265,7 @@ export const SecondBrain: React.FC = () => {
       setSearchResults(prev => prev.filter(r => r.page.urlHash !== urlHash));
       await loadStats();
     } catch (error) {
-      console.error('[SecondBrain] Failed to forget page:', error);
+      console.error('[BrainPlus] Failed to forget page:', error);
       alert('Failed to delete page.');
     }
   };
@@ -281,7 +281,7 @@ export const SecondBrain: React.FC = () => {
       await loadStats();
       alert('All data cleared successfully.');
     } catch (error) {
-      console.error('[SecondBrain] Failed to clear data:', error);
+      console.error('[BrainPlus] Failed to clear data:', error);
       alert('Failed to clear data.');
     }
   };
@@ -293,8 +293,8 @@ export const SecondBrain: React.FC = () => {
   };
 
   return (
-    <div className="second-brain">
-      <h2>🧠 Second Brain</h2>
+    <div className="brain-plus">
+      <h2>🧠 BrainPlus</h2>
 
       {/* Storage Stats */}
       <div className="stats-section">
@@ -435,16 +435,16 @@ export const SecondBrain: React.FC = () => {
       </div>
 
       <style>{`
-        .second-brain {
+        .brain-plus {
           padding: 16px;
         }
 
-        .second-brain h2 {
+        .brain-plus h2 {
           margin: 0 0 16px 0;
           font-size: 20px;
         }
 
-        .second-brain h3 {
+        .brain-plus h3 {
           margin: 16px 0 12px 0;
           font-size: 16px;
           color: #666;

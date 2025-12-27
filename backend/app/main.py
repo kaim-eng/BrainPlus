@@ -20,8 +20,8 @@ async def lifespan(app: FastAPI):
 
 # Create FastAPI app
 app = FastAPI(
-    title="SecondBrain API",
-    description="Optional backend for SecondBrain - Deals matching and points system",
+    title="BrainPlus API",
+    description="Optional backend for BrainPlus - Deals matching and points system",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -50,7 +50,7 @@ async def health_check():
 @app.get("/")
 async def root():
     return {
-        "message": "SecondBrain API",
+        "message": "BrainPlus API",
         "docs": "/docs",
         "health": "/health",
     }

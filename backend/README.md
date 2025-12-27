@@ -1,6 +1,6 @@
-# SecondBrain Backend
+# BrainPlus Backend
 
-FastAPI backend for SecondBrain - Provides optional deals matching and points system.
+FastAPI backend for BrainPlus - Provides optional deals matching and points system.
 
 ## 🚀 Quick Start
 

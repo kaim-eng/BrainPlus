@@ -4,17 +4,17 @@ services:
   # PostgreSQL (User Data)
   postgres:
     image: postgres:16-alpine
-    container_name: secondbrain-postgres
+    container_name: brainplus-postgres
     environment:
-      POSTGRES_USER: secondbrain
+      POSTGRES_USER: brainplus
       POSTGRES_PASSWORD: changeme
-      POSTGRES_DB: secondbrain
+      POSTGRES_DB: brainplus
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U secondbrain"]
+      test: ["CMD-SHELL", "pg_isready -U brainplus"]
       interval: 10s
       timeout: 5s
       retries: 5

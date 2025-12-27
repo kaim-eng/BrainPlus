@@ -1,9 +1,9 @@
 #!/bin/bash
-# SecondBrain Backend Deployment Script for Linux Server
+# BrainPlus Backend Deployment Script for Linux Server
 
 set -e  # Exit on error
 
-echo "🚀 SecondBrain Backend Deployment"
+echo "🚀 BrainPlus Backend Deployment"
 echo "=================================="
 
 # Check if running as root (not recommended)
@@ -42,7 +42,7 @@ if [ ! -f .env ]; then
     
     # Create .env file
     cat > .env << EOF
-# SecondBrain Backend Configuration
+# BrainPlus Backend Configuration
 
 # API Configuration
 API_HOST=0.0.0.0

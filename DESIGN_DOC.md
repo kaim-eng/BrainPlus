@@ -1,4 +1,4 @@
-# SecondBrain - Complete Technical Design & Onboarding Document
+# BrainPlus - Complete Technical Design & Onboarding Document
 
 **Version:** 2.0  
 **Last Updated:** December 18, 2025  
@@ -26,12 +26,12 @@
 
 ## 1. Executive Summary
 
-### 1.1 What is SecondBrain?
+### 1.1 What is BrainPlus?
 
-SecondBrain is a **privacy-first browser extension** that serves as an AI-powered knowledge management system. It captures and organizes your browsing history locally using machine learning embeddings for semantic search, while optionally providing personalized deal recommendations based on aggregated interest signals.
+BrainPlus is a **privacy-first browser extension** that serves as an AI-powered knowledge management system. It captures and organizes your browsing history locally using machine learning embeddings for semantic search, while optionally providing personalized deal recommendations based on aggregated interest signals.
 
 **Core Value Propositions:**
-- 🧠 **Local-First "Second Brain"** - Store and search your browsing history semantically
+- 🧠 **Local-First "BrainPlus"** - Store and search your browsing history semantically
 - 🔒 **Privacy-Preserving** - All content stays on your device, never uploaded to servers
 - 💰 **Optional Rewards** - Earn points by sharing aggregated interests (not browsing history)
 - 🎯 **Intelligent Deals** - Get personalized recommendations without compromising privacy
@@ -424,7 +424,7 @@ async function generateEmbedding(text: string): Promise<Float32Array> {
 
 ### 5.4 Popup UI (`extension/src/popup/`)
 
-**Purpose:** User interface for interacting with Second Brain
+**Purpose:** User interface for interacting with BrainPlus
 
 **Framework:** React 18 + TypeScript + CSS (no UI library for small bundle)
 
@@ -437,17 +437,17 @@ popup/
 ├── styles.css         # Global styles
 └── components/
     ├── Dashboard.tsx      # Overview: points, stats
-    ├── SecondBrain.tsx    # Search interface (NEW)
+    ├── BrainPlus.tsx    # Search interface (NEW)
     ├── ResumeCard.tsx     # Task continuation UI (NEW)
     ├── Settings.tsx       # Privacy controls, preferences
     ├── Onboarding.tsx     # First-time user flow
     └── ManageStorage.tsx  # Storage management UI
 ```
 
-**SecondBrain Tab (Search Feature):**
+**BrainPlus Tab (Search Feature):**
 
 ```typescript
-export function SecondBrain() {
+export function BrainPlus() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<RankedResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -462,7 +462,7 @@ export function SecondBrain() {
       });
       setResults(results);
     } catch (error) {
-      console.error('[SecondBrain] Search failed:', error);
+      console.error('[BrainPlus] Search failed:', error);
     } finally {
       setLoading(false);
     }
@@ -774,7 +774,7 @@ npm test
    - `https://en.wikipedia.org/wiki/Artificial_intelligence`
    - `https://www.amazon.com/Sony-WH-1000XM5/dp/B09XS7JWHH`
 3. **Wait 30 seconds** for indexing
-4. **Open popup → Second Brain tab**
+4. **Open popup → BrainPlus tab**
 5. **Click "Search Your Brain"**
 6. **Type query:** "machine learning"
 7. **Expected:** Results appear with relevance scores
@@ -866,7 +866,7 @@ chrome.storage.local.get('lastSessionCheckTimestamp', data => {
    cd extension
    npm run build
    cd dist
-   zip -r ../secondbrain-v1.0.0.zip .
+   zip -r ../brainplus-v1.0.0.zip .
    ```
 
 2. **Prepare Assets:**
@@ -985,7 +985,7 @@ chrome.storage.local.get('lastSessionCheckTimestamp', data => {
 ### Appendix C: File Structure
 
 ```
-secondbrain/
+brainplus/
 ├── extension/
 │   ├── src/
 │   │   ├── background/
@@ -1010,7 +1010,7 @@ secondbrain/
 │   │   │   ├── styles.css         # Global styles
 │   │   │   └── components/
 │   │   │       ├── Dashboard.tsx      # Overview
-│   │   │       ├── SecondBrain.tsx    # Search UI
+│   │   │       ├── BrainPlus.tsx    # Search UI
 │   │   │       ├── ResumeCard.tsx     # Task continuation UI
 │   │   │       ├── SearchBar.tsx      # Search input
 │   │   │       ├── ResultCard.tsx     # Search result

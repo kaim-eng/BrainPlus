@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { UserPreferences } from '@/lib/types';
-import { SecondBrain } from './SecondBrain';
+import { BrainPlus } from './SecondBrain';
 import { ResumeCard } from './ResumeCard';
 import { AMA } from './AMA';
 
@@ -43,7 +43,7 @@ const Dashboard: React.FC<Props> = ({ onNavigate }) => {
       </div>
 
       {/* Content */}
-      {activeTab === 'search' && <SecondBrain />}
+      {activeTab === 'search' && <BrainPlus />}
       {activeTab === 'ama' && <AMA />}
     </>
   );
