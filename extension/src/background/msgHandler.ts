@@ -6,6 +6,13 @@ import type { BaseMessage } from '@/lib/types';
 import { queuePageForAnalysis, processInferenceResult } from './handlers/pageAnalysis';
 import { handleFetchDeals, handleDealClick } from './handlers/deals';
 import { handleGetPoints, handleRedeemPoints } from './handlers/points';
+import {
+  handleCheckNativeHost,
+  handleInitiatePairing,
+  handleDevicePaired,
+  handleCancelSync,
+  handleGetSyncStatus
+} from './handlers/syncHandler';
 
 /**
  * Route message to appropriate handler
@@ -96,6 +103,22 @@ export async function handleMessage(
       }
       return { success: true };
     }
+    
+    // Cross-Device Sync
+    case 'sync:checkNativeHost':
+      return await handleCheckNativeHost();
+    
+    case 'sync:initiatePairing':
+      return await handleInitiatePairing();
+    
+    case 'sync:devicePaired':
+      return await handleDevicePaired((message as any).data);
+    
+    case 'sync:cancelSync':
+      return await handleCancelSync();
+    
+    case 'sync:getSyncStatus':
+      return await handleGetSyncStatus();
     
     default:
       console.warn('[MsgHandler] Unknown message type:', message.type);

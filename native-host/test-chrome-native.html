@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Native Messaging</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #output {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+        }
+        .success { color: #4CAF50; font-weight: bold; }
+        .error { color: #f44336; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🔍 BrainPlus Native Messaging Test</h1>
+    <p>This page helps test the native messaging connection from the extension.</p>
+    
+    <div>
+        <button onclick="testConnection()">Test Connection</button>
+        <button onclick="clearOutput()">Clear Output</button>
+    </div>
+    
+    <div id="output">Click "Test Connection" to begin...</div>
+
+    <script>
+        const outputDiv = document.getElementById('output');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            const className = type;
+            outputDiv.innerHTML += `<span class="${className}">[${timestamp}] ${prefix} ${message}</span>\n`;
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+        
+        function clearOutput() {
+            outputDiv.innerHTML = '';
+        }
+        
+        async function testConnection() {
+            clearOutput();
+            log('Starting native messaging test...');
+            
+            try {
+                // Send a message to the background script to test native host
+                log('Sending check_availability message to background script...');
+                
+                const response = await chrome.runtime.sendMessage({
+                    type: 'sync:checkNativeHost',
+                    payload: {}
+                });
+                
+                log('Received response from background script:');
+                log(JSON.stringify(response, null, 2));
+                
+                if (response.available) {
+                    log('Native host is available! ✅', 'success');
+                    log(`Version: ${response.version || 'unknown'}`);
+                    log(`Features: ${response.features ? response.features.join(', ') : 'none'}`);
+                } else {
+                    log('Native host is NOT available ❌', 'error');
+                    log(`Error: ${response.error || 'unknown'}`);
+                    
+                    // Provide troubleshooting steps
+                    log('\nTroubleshooting steps:', 'error');
+                    log('1. Make sure you ran: node install-manifest.js <extension-id>');
+                    log('2. Restart Chrome COMPLETELY (close all windows)');
+                    log('3. Check registry: HKCU\\Software\\Google\\Chrome\\NativeMessagingHosts\\com.brainplus.sync_host');
+                    log(`4. Verify manifest exists: C:\\learn_dev\\data_tmp\\new_data_era\\native-host\\manifest.json`);
+                }
+                
+            } catch (error) {
+                log(`Error testing native messaging: ${error.message}`, 'error');
+                log(error.stack);
+            }
+        }
+    </script>
+</body>
+</html>
+

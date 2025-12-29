@@ -21,6 +21,7 @@ This is a monorepo containing:
 - **🤖 Ask Me Anything (AMA)**: Query your browsing history with natural language
 - **🧠 Local RAG**: Retrieval-Augmented Generation with passage-level semantic search
 - **🔍 Semantic Search**: Find pages by meaning, not just keywords
+- **📱 Cross-Device Sync**: Sync history between mobile and desktop with end-to-end encryption
 - **💾 Local-First Storage**: All browsing history stays on your device in IndexedDB
 - **🎯 ML-Powered Embeddings**: 512-dimensional vectors using Universal Sentence Encoder (runs locally)
 - **🛡️ Privacy-First**: Denylist protection for 75+ sensitive domains (banking, healthcare, email)
@@ -38,7 +39,29 @@ npm run dev        # Development with hot reload
 npm run build      # Production build
 ```
 
-### Backend Development
+### Cross-Device Sync (Optional)
+
+**1. Start Signaling Server:**
+```bash
+cd signaling-server
+npm install
+npm start          # WebSocket server on ws://localhost:8080
+```
+
+**2. Install Native Messaging Host (Desktop only):**
+```bash
+cd native-host
+npm install
+node install-manifest.js YOUR_EXTENSION_ID
+# Restart Chrome after installation
+```
+
+**3. Usage:**
+- Desktop: Click extension → Sync → Generate QR Code
+- Mobile: Click extension → Sync → Scan QR Code → Camera opens
+- Both devices sync automatically with E2E encryption
+
+### Backend Development (Optional)
 
 ```bash
 cd backend
@@ -49,10 +72,11 @@ uvicorn app.main:app --reload
 
 ## 📚 Documentation
 
-- **AMA_DESIGN_REVIEW.md**: Complete AMA feature design and gap analysis
-- **AMA_IMPLEMENTATION_SUMMARY.md**: Phase 0 & Phase 1 implementation details
-- **AMA_TESTING_GUIDE.md**: Comprehensive testing guide with 16 test cases
-- **AMA_QUICK_REFERENCE.md**: Developer quick reference for AMA feature
+- **DESIGN_DOC.md**: Complete technical design and onboarding document
+  - System architecture and component details
+  - Feature implementations (Search, Task Continuation, Cross-Device Sync)
+  - Testing strategies and troubleshooting guides
+  - API specifications and privacy architecture
 
 ## 🔒 Privacy & Security
 
@@ -101,12 +125,15 @@ pytest --brave     # Brave-specific test suite
 
 ## 📋 Development Phases
 
-- ✅ Phase 0: Privacy & Storage (Denylist, DB v4, Chunking, Quality Eviction)
-- ✅ Phase 1: AMA MVP (Extractive answers, Citations, Passage retrieval)
-- 🚧 Phase 2: LLM Integration (WebLLM, Streaming, Verifier)
-- ⏳ Phase 3: Advanced Features (Global shortcut, Model download UI)
-- ⏳ Phase 4: Testing & QA
-- ⏳ Phase 5: Deployment
+- ✅ Phase 0: Dead Code Elimination & Foundation
+- ✅ Phase 1: IndexedDB & ML Infrastructure
+- ✅ Phase 2: On-Device Inference (TensorFlow.js + USE)
+- ✅ Phase 3: Semantic Search Feature
+- ✅ Phase 4: Task Continuation Feature
+- ✅ Phase 5: Cross-Device Sync (QR pairing, E2E encryption)
+- 🚧 Phase 6: Testing & QA
+- ⏳ Phase 7: LLM Integration (WebLLM, Streaming)
+- ⏳ Phase 8: Chrome Web Store Deployment
 
 ## 🎯 Critical Success Factors
 
@@ -116,8 +143,12 @@ pytest --brave     # Brave-specific test suite
 - [x] Passage-level chunking and retrieval
 - [x] AMA with extractive answers and citations
 - [x] Quality-aware storage eviction
-- [ ] WebLLM integration (Phase 2)
-- [ ] Streaming token generation (Phase 2)
+- [x] Cross-device sync with E2E encryption
+- [x] QR code pairing (< 30 seconds)
+- [x] Smart merge conflict resolution
+- [x] Vector compatibility validation
+- [ ] WebLLM integration (Phase 7)
+- [ ] Streaming token generation (Phase 7)
 
 ## 📄 License
 

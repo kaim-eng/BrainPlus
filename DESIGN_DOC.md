@@ -1,8 +1,8 @@
 # BrainPlus - Complete Technical Design & Onboarding Document
 
-**Version:** 2.0  
-**Last Updated:** December 18, 2025  
-**Status:** Active Development (v0.2 - Local-First Architecture with Task Continuation)
+**Version:** 3.0  
+**Last Updated:** December 29, 2025  
+**Status:** Active Development (v0.3 - Cross-Device Sync Implemented)
 
 ---
 
@@ -20,7 +20,8 @@
 10. [Testing Strategy](#10-testing-strategy)
 11. [Deployment & Operations](#11-deployment--operations)
 12. [Troubleshooting Guide](#12-troubleshooting-guide)
-13. [Appendices](#13-appendices)
+13. [Cross-Device Sync](#13-cross-device-sync)
+14. [Appendices](#14-appendices)
 
 ---
 
@@ -36,6 +37,7 @@ BrainPlus is a **privacy-first browser extension** that serves as an AI-powered 
 - 💰 **Optional Rewards** - Earn points by sharing aggregated interests (not browsing history)
 - 🎯 **Intelligent Deals** - Get personalized recommendations without compromising privacy
 - 🔄 **Task Continuation** - Resume interrupted browsing sessions intelligently
+- 📱 **Cross-Device Sync** - Sync history between mobile and desktop with E2E encryption
 
 ### 1.2 Architecture Philosophy
 
@@ -73,9 +75,10 @@ v0.1 (OLD):                          v0.2 (CURRENT):
 | Phase 2: On-Device Inference (ML Model) | ✅ Complete | 1.5 weeks |
 | Phase 3: Search Feature | ✅ Complete | 1 week |
 | Phase 4: Task Continuation Feature | ✅ Complete | 1 week |
-| Phase 5: Testing & Refinement | 🚧 In Progress | 1 week |
+| Phase 5: Cross-Device Sync | ✅ Complete | 1 week |
+| Phase 6: Testing & Refinement | 🚧 In Progress | 1 week |
 
-**Total Timeline:** 6 weeks to Beta
+**Total Timeline:** 7 weeks to Beta
 
 ---
 
@@ -238,6 +241,67 @@ Open Tabs (deduplicated, max 20) → Clear Badge
 
 ---
 
+### 3.3 Cross-Device Sync ✅
+
+**Status:** Production Ready  
+**Completion Date:** December 29, 2025
+
+**Overview:**
+Sync browsing history between mobile and desktop devices using QR code pairing and end-to-end encryption. All data is encrypted before transmission with no server-side storage.
+
+**Key Features:**
+- ✅ QR code pairing (< 30 seconds setup)
+- ✅ End-to-end encryption (ECDH P-256 + AES-256-GCM)
+- ✅ Bidirectional sync (desktop ↔ mobile)
+- ✅ Vector compatibility validation (prevents broken search)
+- ✅ Smart merge (field-level conflict resolution)
+- ✅ Native messaging host (Windows/macOS/Linux)
+- ✅ WebSocket signaling server
+- ✅ Progress tracking with real-time updates
+- ✅ Batch processing (efficient network usage)
+- ✅ Auto-expiring sessions (5-minute QR codes)
+
+**Architecture:**
+```
+Desktop                    Signaling Server (ws)             Mobile
+   ↓                              ↓                            ↓
+Generate QR → JOIN      Route messages      Scan QR → JOIN
+Send public key →       Pass-through        → Receive key
+Derive AES key ←────────────────────────────→ Derive AES key
+Encrypt batches →       Never decrypts!      → Decrypt batches
+Receive batches ←       Route back           ← Send batches
+Smart merge                                   Smart merge
+   ↓                                               ↓
+Complete ✅                                    Complete ✅
+```
+
+**Security:**
+- ECDH P-256 key exchange (ephemeral keys per session)
+- AES-256-GCM authenticated encryption
+- Zero-knowledge signaling server (never sees plaintext)
+- QR code expiration (5 minutes)
+- Vector metadata validation (hard fail on incompatibility)
+
+**Files:**
+- `extension/src/lib/sync/` - Sync infrastructure (8 modules, ~2,100 LOC)
+  - `SyncManager.ts` - Main coordinator
+  - `SignalingClient.ts` - WebSocket communication
+  - `ecdhCrypto.ts` - ECDH + AES-256-GCM encryption
+  - `smartMerge.ts` - Field-level conflict resolution
+  - `qrGenerator.ts` - QR code generation/parsing
+  - `vectorCompatibility.ts` - ML model version validation
+  - `serialization.ts` - PageDigest ↔ Base64 conversion
+  - `nativeHost.ts` - Native messaging client
+- `native-host/` - Native messaging host (Node.js)
+  - `brainplus-sync-host.js` - Main host script
+  - `install-manifest.js` - Cross-platform installer
+- `signaling-server/` - WebSocket server
+  - `server.js` - Signaling relay (room-based)
+
+**Documentation:** See [Cross-Device Sync](#13-cross-device-sync) for complete documentation.
+
+---
+
 ## 4. Technology Stack
 
 ### 4.1 Extension (Frontend)
@@ -251,6 +315,9 @@ Open Tabs (deduplicated, max 20) → Clear Badge
 | **Universal Sentence Encoder** | 1.3.3 | 512-dim embeddings |
 | **IndexedDB (idb)** | 8.0.3 | Local database wrapper |
 | **Stopword** | 3.1.5 | Keyword extraction |
+| **QRCode** | 1.5.4 | QR code generation |
+| **html5-qrcode** | 2.3.8 | QR code scanning (mobile) |
+| **WebSocket (ws)** | 8.14.2 | Real-time communication |
 | **Chrome Extensions API** | MV3 | Browser integration |
 
 **Bundle Size Target:** < 5MB (including ML model)
@@ -942,7 +1009,475 @@ chrome.storage.local.get('lastSessionCheckTimestamp', data => {
 
 ---
 
-## 13. Appendices
+## 13. Cross-Device Sync
+
+### 13.1 Feature Overview
+
+**Cross-Device Sync** enables users to synchronize browsing history between mobile and desktop devices using QR code pairing and end-to-end encryption.
+
+**Value Propositions:**
+- 🔄 **Seamless Sync** - Research on mobile, continue on desktop (and vice versa)
+- 🔒 **Privacy-First** - All data encrypted end-to-end, no server storage
+- 📱 **Device Agnostic** - Works on any Chromium-based browser
+- ⚡ **Local-First** - Direct peer-to-peer communication
+- 🎯 **Zero Setup** - QR code pairing in < 30 seconds
+
+**User Flow:**
+1. Desktop user clicks "Sync" → QR code appears
+2. Mobile user scans QR code → Automatic pairing
+3. History merges bidirectionally → Smart conflict resolution
+4. Complete! Both devices have full browsing history
+
+### 13.2 Architecture
+
+**High-Level Design:**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Desktop Device                            │
+├─────────────────────────────────────────────────────────────────┤
+│  Extension                Native Host           Signaling       │
+│     ↓                          ↓                    ↓           │
+│  SyncManager  ←────→  brainplus-sync-host  ←────→  WebSocket   │
+│     ↓                          ↓                    ↓           │
+│  IndexedDB                 QR Generator         Room: abc123    │
+│  (PageDigest)              Node.js                 ↓           │
+│     ↓                                          Pass-through     │
+│  Encryption ────────────────────────────────────────────────────┤
+│  (ECDH + AES)                                      ↓            │
+└────────────────────────────────────────────────────┼────────────┘
+                                                     │
+┌────────────────────────────────────────────────────┼────────────┐
+│                         Mobile Device              ↓            │
+├─────────────────────────────────────────────────────────────────┤
+│  Extension                                    WebSocket         │
+│     ↓                                             ↓            │
+│  SyncManager  ←────────────────────────────  Room: abc123      │
+│     ↓                                             ↓            │
+│  IndexedDB                                   Pass-through      │
+│  (PageDigest)                                                  │
+│     ↓                                                           │
+│  Encryption ←──────────────────────────────────────────────────┘
+│  (ECDH + AES)
+│     ↓
+│  QR Scanner (html5-qrcode)
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Component Responsibilities:**
+
+| Component | Responsibility |
+|-----------|----------------|
+| **SyncManager** | Orchestrates sync flow, manages session state |
+| **SignalingClient** | WebSocket communication, room management |
+| **Native Host** | QR generation, local network bridge (desktop only) |
+| **ecdhCrypto** | Key exchange, encryption/decryption |
+| **smartMerge** | Field-level conflict resolution |
+| **vectorCompatibility** | ML model version validation |
+| **serialization** | PageDigest ↔ Base64 conversion |
+| **QRScanner** | Camera-based QR scanning (mobile) |
+
+### 13.3 Security & Privacy
+
+**Encryption Architecture:**
+
+```
+Desktop                                    Mobile
+   ↓                                          ↓
+Generate ECDH key pair (P-256)    Generate ECDH key pair (P-256)
+   ↓                                          ↓
+Public key → QR code → Scan      ← Public key
+   ↓                                          ↓
+Derive shared secret ←────────────→ Derive shared secret
+(ECDH key agreement)              (ECDH key agreement)
+   ↓                                          ↓
+AES-256-GCM key                   AES-256-GCM key
+   ↓                                          ↓
+Encrypt PageDigest batches        Decrypt PageDigest batches
+   ↓                                          ↓
+Send via WebSocket →              ← Receive via WebSocket
+(Signaling server NEVER decrypts)
+```
+
+**Key Security Features:**
+
+1. **End-to-End Encryption**
+   - ECDH P-256 key exchange
+   - AES-256-GCM authenticated encryption
+   - 128-bit authentication tags
+   - No server-side decryption
+
+2. **Ephemeral Keys**
+   - New key pair generated per session
+   - Keys never stored persistently
+   - Session ends → Keys destroyed
+
+3. **Zero-Knowledge Server**
+   - Signaling server only routes encrypted messages
+   - Never has access to shared secret
+   - Cannot decrypt browsing history
+
+4. **QR Code Expiration**
+   - 5-minute expiration window
+   - Prevents stale pairing attempts
+   - Reduces attack surface
+
+5. **Vector Compatibility Validation**
+   - Hard fail on ML model version mismatch
+   - Prevents broken semantic search
+   - User-friendly error messages
+
+### 13.4 Conflict Resolution
+
+**Smart Merge Strategy:**
+
+Instead of naive Last-Write-Wins (LWW), we use field-level merging:
+
+```typescript
+function mergePageDigests(local: PageDigest, remote: PageDigest): PageDigest {
+  return {
+    // Identifiers (must match)
+    urlHash: local.urlHash,
+    url: local.url,
+    
+    // Content: Keep longest/best quality
+    title: remote.title.length > local.title.length ? remote.title : local.title,
+    summary: remote.summary.length > local.summary.length ? remote.summary : local.summary,
+    
+    // ML Outputs: Keep highest intent score version
+    intentScore: Math.max(local.intentScore, remote.intentScore),
+    vector: local.intentScore >= remote.intentScore ? local.vector : remote.vector,
+    
+    // Entities/Keywords: Union (remove duplicates)
+    entities: Array.from(new Set([...local.entities, ...remote.entities])),
+    keywords: Array.from(new Set([...local.keywords, ...remote.keywords])),
+    
+    // Timestamps: Keep most recent access
+    timestamp: Math.min(local.timestamp, remote.timestamp), // First visit
+    lastAccessed: Math.max(local.lastAccessed, remote.lastAccessed), // Most recent
+    
+    // Privacy: OR (if either device marked private, keep private)
+    isPrivate: local.isPrivate || remote.isPrivate,
+  };
+}
+```
+
+**Benefits:**
+- ✅ Preserves best data from both devices
+- ✅ No data loss from naive overwriting
+- ✅ Union of keywords/entities (better search)
+- ✅ Respects privacy flags from both devices
+
+### 13.5 Native Messaging Host
+
+**Purpose:**
+Bridge between browser extension and operating system for:
+- QR code generation (requires Node.js libraries)
+- Local network communication
+- System-level operations
+
+**Architecture:**
+
+```
+Chrome Extension (JavaScript)
+        ↓
+Native Messaging API (chrome.runtime.connectNative)
+        ↓
+brainplus-sync-host.js (Node.js)
+        ↓
+Operating System
+```
+
+**Installation (Windows):**
+
+```bash
+cd native-host
+npm install
+node install-manifest.js YOUR_EXTENSION_ID
+```
+
+**What it does:**
+1. Installs manifest to Windows Registry:
+   ```
+   HKCU\Software\Google\Chrome\NativeMessagingHosts\com.brainplus.sync_host
+   ```
+2. Points to wrapper script: `brainplus-sync-host-wrapper.bat`
+3. Wrapper calls: `node.exe brainplus-sync-host.js`
+
+**Communication Protocol:**
+
+```typescript
+// Request (from extension)
+{
+  type: "generate_qr",
+  payload: {
+    deviceId: "desktop-abc123",
+    signalingUrl: "ws://localhost:8080",
+    roomId: "room_xyz789",
+    publicKey: "base64-encoded-key",
+    expiresAt: 1767017906617
+  }
+}
+
+// Response (from native host)
+{
+  success: true,
+  type: "qr_generated",
+  data: {
+    roomId: "room_xyz789",
+    qrCodeDataUrl: "data:image/png;base64,iVBORw0KGgo...",
+    expiresAt: 1767017906617
+  }
+}
+```
+
+### 13.6 WebSocket Signaling Server
+
+**Purpose:**
+Relay encrypted messages between devices without decrypting them.
+
+**Room-Based Architecture:**
+
+```
+Room: room_abc123
+├── Client 1 (Desktop) - Connected
+└── Client 2 (Mobile)  - Connected
+
+Messages:
+1. JOIN - Enter room
+2. KEY_EXCHANGE - Share ECDH public keys
+3. HISTORY_BATCH - Send encrypted PageDigest batches
+4. BATCH_ACK - Acknowledge receipt
+5. SYNC_DONE - Signal completion
+6. PING/PONG - Heartbeat (30s interval)
+```
+
+**Server Implementation:**
+
+```javascript
+// signaling-server/server.js
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 });
+
+const rooms = new Map(); // roomId → Set<WebSocket>
+
+wss.on('connection', (ws) => {
+  ws.on('message', (data) => {
+    const msg = JSON.parse(data);
+    
+    if (msg.type === 'JOIN') {
+      // Add client to room
+      if (!rooms.has(msg.roomId)) {
+        rooms.set(msg.roomId, new Set());
+      }
+      rooms.get(msg.roomId).add(ws);
+    } else {
+      // Forward to all clients in same room
+      const room = rooms.get(msg.roomId);
+      room?.forEach(client => {
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(msg)); // Pass-through encrypted message
+        }
+      });
+    }
+  });
+});
+```
+
+**Starting the Server:**
+
+```bash
+cd signaling-server
+npm install
+npm start
+# Server listening on ws://localhost:8080
+```
+
+### 13.7 Implementation Details
+
+**Files Created:**
+
+```
+extension/src/lib/sync/
+├── SyncManager.ts           # Main coordinator (400 LOC)
+├── SignalingClient.ts       # WebSocket communication (300 LOC)
+├── ecdhCrypto.ts            # ECDH + AES-256-GCM (300 LOC)
+├── smartMerge.ts            # Conflict resolution (350 LOC)
+├── qrGenerator.ts           # QR generation/parsing (250 LOC)
+├── vectorCompatibility.ts   # Version validation (200 LOC)
+├── serialization.ts         # PageDigest conversion (300 LOC)
+├── nativeHost.ts            # Native messaging client (150 LOC)
+└── types.ts                 # Type definitions (200 LOC)
+
+extension/src/popup/components/
+├── SyncView.tsx             # Sync UI (400 LOC)
+└── QRScanner.tsx            # QR scanning (mobile) (200 LOC)
+
+extension/src/background/handlers/
+└── syncHandler.ts           # Background message handlers (250 LOC)
+
+native-host/
+├── brainplus-sync-host.js   # Native host (400 LOC)
+├── install-manifest.js      # Installer script (150 LOC)
+└── brainplus-sync-host-wrapper.bat  # Windows wrapper
+
+signaling-server/
+└── server.js                # WebSocket server (150 LOC)
+
+Total: ~3,300 LOC (not counting tests/docs)
+```
+
+**Dependencies Added:**
+
+```json
+{
+  "qrcode": "1.5.4",           // QR code generation
+  "html5-qrcode": "2.3.8",     // QR code scanning (mobile)
+  "ws": "8.14.2"               // WebSocket (signaling server)
+}
+```
+
+### 13.8 Testing
+
+**Manual Testing (Desktop):**
+
+1. **Setup:**
+   ```bash
+   # Terminal 1: Start signaling server
+   cd signaling-server
+   npm start
+   
+   # Terminal 2: Install native host
+   cd native-host
+   npm install
+   node install-manifest.js YOUR_EXTENSION_ID
+   ```
+
+2. **Build extension:**
+   ```bash
+   cd extension
+   npm run build
+   ```
+
+3. **Load in Chrome:**
+   - `chrome://extensions` → Load unpacked → Select `extension/dist`
+
+4. **Test sync:**
+   - Click BrainPlus icon → Sync tab
+   - Click "Generate QR Code"
+   - Verify QR code appears
+   - Verify WebSocket connection: "Connected to signaling server"
+
+**Testing Scenarios:**
+
+| Scenario | Steps | Expected Result |
+|----------|-------|-----------------|
+| **Happy Path** | Desktop generates QR → Mobile scans | Both devices sync successfully |
+| **QR Expiration** | Wait 5 minutes → Scan QR | Error: "QR code expired" |
+| **Vector Mismatch** | Desktop TF.js 4.22.0 → Mobile 4.21.0 | Hard fail with clear error message |
+| **Conflict Resolution** | Same URL on both, different titles | Longest title wins |
+| **Large History** | 5,000 pages × 2KB each ≈ 10MB | Batched transfer, progress bar updates |
+| **Network Interruption** | Disconnect WiFi mid-sync | Reconnection with resume |
+| **Native Host Missing** | Uninstall native host | Clear installation instructions |
+
+### 13.9 Troubleshooting
+
+**Issue: "Sync Companion Required"**
+
+**Cause:** Native messaging host not installed or not detected.
+
+**Solution:**
+1. Install native host:
+   ```bash
+   cd native-host
+   npm install
+   node install-manifest.js YOUR_EXTENSION_ID
+   ```
+2. **Restart Chrome completely** (close ALL windows)
+3. Verify registry entry (Windows):
+   ```
+   reg query "HKCU\Software\Google\Chrome\NativeMessagingHosts\com.brainplus.sync_host"
+   ```
+
+**Issue: "WebSocket connection failed"**
+
+**Cause:** Signaling server not running.
+
+**Solution:**
+```bash
+cd signaling-server
+npm install
+npm start
+# Should see: "✅ Server listening on port 8080"
+```
+
+**Issue: "Vector compatibility check failed"**
+
+**Cause:** Different TensorFlow.js or USE versions on devices.
+
+**Solution:**
+1. Both devices must use **exact** same versions:
+   ```json
+   {
+     "@tensorflow/tfjs": "4.22.0",  // No ^ or ~
+     "@tensorflow-models/universal-sentence-encoder": "1.3.3"
+   }
+   ```
+2. Update extension on both devices
+3. Clear browser cache
+4. Retry sync
+
+**Issue: QR code doesn't appear**
+
+**Cause:** Native host can't generate QR code.
+
+**Solution:**
+1. Check native host log:
+   ```bash
+   # Windows
+   type %TEMP%\brainplus-sync-host.log
+   
+   # macOS/Linux
+   tail -f /tmp/brainplus-sync-host.log
+   ```
+2. Verify `qrcode` library installed:
+   ```bash
+   cd native-host
+   npm list qrcode
+   ```
+
+### 13.10 Future Enhancements
+
+**Planned Features:**
+
+1. **Continuous Sync** (v2)
+   - Background sync every hour
+   - Push notifications for updates
+   - Incremental sync (only changed pages)
+
+2. **Multi-Device Support** (v2)
+   - Sync more than 2 devices
+   - Device management UI (see all paired devices)
+   - Selective sync (choose which device to sync with)
+
+3. **Cloud Backup** (v3, Optional)
+   - End-to-end encrypted cloud storage
+   - For disaster recovery only
+   - User-controlled encryption keys
+
+4. **Conflict Resolution UI** (v2)
+   - Manual conflict resolution
+   - Side-by-side comparison
+   - "Keep both" option
+
+5. **Sync Analytics** (v2)
+   - Track sync performance
+   - Identify bottlenecks
+   - Optimize batch sizes
+
+---
+
+## 14. Appendices
 
 ### Appendix A: Glossary
 

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"="width=device-width, initial-scale=1.0">
+  <title>Phase 0 Benchmarks - BrainPlus Sync</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 40px;
+    }
+    
+    h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    
+    .warning {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin-bottom: 30px;
+      border-radius: 4px;
+    }
+    
+    .warning strong {
+      color: #856404;
+    }
+    
+    .benchmark-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    
+    .benchmark-section h2 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 1.3em;
+    }
+    
+    .benchmark-section p {
+      color: #666;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+    
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    
+    button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .output {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 20px;
+      border-radius: 6px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 13px;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 20px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      display: none;
+    }
+    
+    .output.show {
+      display: block;
+    }
+    
+    .status {
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin-top: 10px;
+      display: none;
+    }
+    
+    .status.show {
+      display: block;
+    }
+    
+    .status.pass {
+      background: #d4edda;
+      color: #155724;
+      border-left: 4px solid #28a745;
+    }
+    
+    .status.warning {
+      background: #fff3cd;
+      color: #856404;
+      border-left: 4px solid #ffc107;
+    }
+    
+    .status.fail {
+      background: #f8d7da;
+      color: #721c24;
+      border-left: 4px solid #dc3545;
+    }
+    
+    .platform-info {
+      background: #e7f3ff;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    
+    .platform-info strong {
+      color: #0066cc;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 Phase 0: Pre-Flight Benchmarks</h1>
+    <p class="subtitle">Cross-Device Sync Implementation Validation</p>
+    
+    <div class="warning">
+      <strong>⚠️ IMPORTANT:</strong> Run these benchmarks on BOTH desktop and mobile devices before implementing Phase 1.
+      Save the console output from each device to compare results.
+    </div>
+    
+    <div class="platform-info" id="platformInfo">
+      <strong>Platform:</strong> Loading...
+    </div>
+    
+    <!-- Benchmark 1: Serialization -->
+    <div class="benchmark-section">
+      <h2>1. Serialization Performance ⚡ CRITICAL</h2>
+      <p>
+        <strong>What it tests:</strong> How fast can we convert 512-dim vectors to Base64 strings?<br>
+        <strong>Why it matters:</strong> If > 500ms on low-end mobile, UI will freeze during sync.<br>
+        <strong>Target:</strong> < 200ms optimal, < 500ms acceptable
+      </p>
+      <button id="runSerialization">Run Serialization Test (100 pages)</button>
+      <button id="runMultipleSizes">Run Multiple Sizes (50, 100, 200)</button>
+      <div id="serializationStatus" class="status"></div>
+      <div id="serializationOutput" class="output"></div>
+    </div>
+    
+    <!-- Benchmark 2: Vector Compatibility -->
+    <div class="benchmark-section">
+      <h2>2. Vector Compatibility 🔴 BLOCKING</h2>
+      <p>
+        <strong>What it tests:</strong> Does TensorFlow.js produce identical embeddings across devices?<br>
+        <strong>Why it matters:</strong> Different vectors = broken semantic search on synced content.<br>
+        <strong>Target:</strong> Identical vectors across all devices (ε < 1e-6)
+      </p>
+      <button id="runVectorTest">Run Vector Compatibility Test</button>
+      <button id="copyResults">Copy Results for Comparison</button>
+      <div id="vectorStatus" class="status"></div>
+      <div id="vectorOutput" class="output"></div>
+    </div>
+    
+    <!-- Results Summary -->
+    <div class="benchmark-section">
+      <h2>📊 Summary</h2>
+      <p id="summary">Run benchmarks above to see results summary.</p>
+    </div>
+  </div>
+
+  <script type="module">
+    // Platform detection
+    function getPlatformInfo() {
+      const ua = navigator.userAgent;
+      let browser = 'Unknown';
+      if (ua.includes('Chrome') && !ua.includes('Edg')) browser = 'Chrome';
+      else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
+      else if (ua.includes('Edg')) browser = 'Edge';
+      else if (ua.includes('Firefox')) browser = 'Firefox';
+      
+      let platform = 'Unknown';
+      if (ua.includes('Windows')) platform = 'Windows';
+      else if (ua.includes('Mac')) platform = 'macOS';
+      else if (ua.includes('Linux')) platform = 'Linux';
+      else if (ua.includes('iPhone') || ua.includes('iPad')) platform = 'iOS';
+      else if (ua.includes('Android')) platform = 'Android';
+      
+      return { platform, browser };
+    }
+    
+    // Display platform info
+    const { platform, browser } = getPlatformInfo();
+    document.getElementById('platformInfo').innerHTML = `
+      <strong>Platform:</strong> ${platform}<br>
+      <strong>Browser:</strong> ${browser}<br>
+      <strong>User Agent:</strong> ${navigator.userAgent}
+    `;
+    
+    // Set up console capture
+    const originalLog = console.log;
+    const originalWarn = console.warn;
+    const originalError = console.error;
+    
+    let currentOutput = null;
+    
+    function captureOutput(outputElement) {
+      currentOutput = outputElement;
+      currentOutput.textContent = '';
+      currentOutput.classList.add('show');
+      
+      console.log = (...args) => {
+        originalLog(...args);
+        if (currentOutput) {
+          currentOutput.textContent += args.join(' ') + '\n';
+        }
+      };
+      
+      console.warn = (...args) => {
+        originalWarn(...args);
+        if (currentOutput) {
+          currentOutput.textContent += '⚠️ ' + args.join(' ') + '\n';
+        }
+      };
+      
+      console.error = (...args) => {
+        originalError(...args);
+        if (currentOutput) {
+          currentOutput.textContent += '❌ ' + args.join(' ') + '\n';
+        }
+      };
+    }
+    
+    function restoreConsole() {
+      console.log = originalLog;
+      console.warn = originalWarn;
+      console.error = originalError;
+      currentOutput = null;
+    }
+    
+    // Make benchmark functions available globally
+    window.runBenchmark = true;
+    
+    // Import benchmark modules
+    import('./phase0-serialization.js').then(module => {
+      window.serializationModule = module;
+      originalLog('✅ Serialization benchmark module loaded');
+    }).catch(err => {
+      originalError('❌ Failed to load serialization module:', err);
+    });
+    
+    import('./phase0-vector-compatibility.js').then(module => {
+      window.vectorModule = module;
+      originalLog('✅ Vector compatibility benchmark module loaded');
+    }).catch(err => {
+      originalError('❌ Failed to load vector compatibility module:', err);
+    });
+    
+    // Button handlers
+    document.getElementById('runSerialization').addEventListener('click', async function() {
+      this.disabled = true;
+      this.innerHTML = 'Running... <span class="loading"></span>';
+      
+      const output = document.getElementById('serializationOutput');
+      const status = document.getElementById('serializationStatus');
+      
+      captureOutput(output);
+      
+      try {
+        const result = await window.serializationModule.benchmarkSerialization(100);
+        
+        status.className = 'status show ' + result.verdict.toLowerCase();
+        status.textContent = result.recommendation;
+      } catch (error) {
+        console.error('Benchmark failed:', error);
+        status.className = 'status show fail';
+        status.textContent = '❌ Benchmark failed: ' + error.message;
+      } finally {
+        restoreConsole();
+        this.disabled = false;
+        this.innerHTML = 'Run Serialization Test (100 pages)';
+      }
+    });
+    
+    document.getElementById('runMultipleSizes').addEventListener('click', async function() {
+      this.disabled = true;
+      this.innerHTML = 'Running... <span class="loading"></span>';
+      
+      const output = document.getElementById('serializationOutput');
+      const status = document.getElementById('serializationStatus');
+      
+      captureOutput(output);
+      
+      try {
+        await window.serializationModule.benchmarkMultipleSizes();
+        status.className = 'status show pass';
+        status.textContent = '✅ See console output for results';
+      } catch (error) {
+        console.error('Benchmark failed:', error);
+        status.className = 'status show fail';
+        status.textContent = '❌ Benchmark failed: ' + error.message;
+      } finally {
+        restoreConsole();
+        this.disabled = false;
+        this.innerHTML = 'Run Multiple Sizes (50, 100, 200)';
+      }
+    });
+    
+    document.getElementById('runVectorTest').addEventListener('click', async function() {
+      this.disabled = true;
+      this.innerHTML = 'Running... <span class="loading"></span>';
+      
+      const output = document.getElementById('vectorOutput');
+      const status = document.getElementById('vectorStatus');
+      
+      captureOutput(output);
+      
+      try {
+        const result = await window.vectorModule.testVectorCompatibility();
+        
+        if (result.success) {
+          status.className = 'status show pass';
+          status.textContent = '✅ Vector test completed successfully. Save results to compare with other devices!';
+          
+          // Store result for comparison
+          window.vectorTestResult = result;
+          document.getElementById('copyResults').disabled = false;
+        } else {
+          status.className = 'status show fail';
+          status.textContent = '❌ Vector test failed: ' + (result.error || 'Unknown error');
+        }
+      } catch (error) {
+        console.error('Benchmark failed:', error);
+        status.className = 'status show fail';
+        status.textContent = '❌ Benchmark failed: ' + error.message;
+      } finally {
+        restoreConsole();
+        this.disabled = false;
+        this.innerHTML = 'Run Vector Compatibility Test';
+      }
+    });
+    
+    document.getElementById('copyResults').addEventListener('click', function() {
+      if (!window.vectorTestResult) {
+        alert('Run the vector test first!');
+        return;
+      }
+      
+      const result = window.vectorTestResult;
+      const summary = {
+        platform: result.platform,
+        browser: result.browser,
+        backend: result.backend,
+        tfVersion: result.tfVersion,
+        useVersion: result.useVersion,
+        firstVectorPreview: Array.from(result.vectors[0].slice(0, 10)),
+        l2Norms: result.l2Norms,
+        testSentences: result.testSentences,
+      };
+      
+      const text = JSON.stringify(summary, null, 2);
+      navigator.clipboard.writeText(text).then(() => {
+        alert('✅ Results copied to clipboard! Paste this into your comparison tool.');
+      }).catch(err => {
+        alert('❌ Failed to copy: ' + err.message);
+      });
+    });
+  </script>
+</body>
+</html>
+

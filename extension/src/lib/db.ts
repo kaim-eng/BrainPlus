@@ -800,6 +800,11 @@ class DataPayDB {
 
 export const db = new DataPayDB();
 
+// Convenience exports for direct access
+export const saveDigest = (digest: PageDigest) => db.saveDigest(digest);
+export const getDigestByUrl = (url: string) => db.getDigestByUrl(url);
+export const getAllDigests = () => db.getAll();
+
 // ============================================================================
 // Utility: Generate URL hash for digest key
 // ============================================================================

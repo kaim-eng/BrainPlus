@@ -6,7 +6,7 @@ import { AMA } from './AMA';
 
 interface Props {
   preferences: UserPreferences;
-  onNavigate: (view: 'dashboard' | 'settings') => void;
+  onNavigate: (view: 'dashboard' | 'settings' | 'sync') => void;
 }
 
 const Dashboard: React.FC<Props> = ({ onNavigate }) => {
@@ -17,6 +17,9 @@ const Dashboard: React.FC<Props> = ({ onNavigate }) => {
       <div className="header">
         <h1>🧠 BrainPlus</h1>
         <div className="header-actions">
+          <button className="secondary" onClick={() => onNavigate('sync')}>
+            📱 Sync
+          </button>
           <button className="secondary" onClick={() => onNavigate('settings')}>
             Settings
           </button>

@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
 import Settings from './components/Settings';
 import Onboarding from './components/Onboarding';
+import SyncView from './components/SyncView';
 import { getLocal, setLocal } from '@/lib/storage';
 import { STORAGE_KEYS } from '@/lib/constants';
 import type { UserPreferences } from '@/lib/types';
 
 const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'settings' | 'onboarding'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'settings' | 'onboarding' | 'sync'>('dashboard');
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -77,6 +78,10 @@ const App: React.FC = () => {
           onUpdate={handleUpdatePreferences}
           onBack={() => setCurrentView('dashboard')}
         />
+      )}
+      
+      {currentView === 'sync' && (
+        <SyncView />
       )}
     </div>
   );

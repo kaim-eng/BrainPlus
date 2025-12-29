@@ -1,0 +1,25 @@
+{
+  "name": "brainplus-sync-host",
+  "version": "1.0.0",
+  "description": "Native messaging host for BrainPlus cross-device sync",
+  "main": "brainplus-sync-host.js",
+  "bin": {
+    "brainplus-sync-host": "./brainplus-sync-host.js"
+  },
+  "scripts": {
+    "start": "node brainplus-sync-host.js",
+    "install-manifest": "node install-manifest.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "qrcode": "^1.5.3"
+  },
+  "keywords": [
+    "native-messaging",
+    "chrome-extension",
+    "sync"
+  ],
+  "author": "BrainPlus Team",
+  "license": "MIT"
+}
+

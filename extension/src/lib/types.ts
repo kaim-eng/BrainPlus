@@ -27,7 +27,12 @@ export type MessageType =
   | 'AMA_TOKEN' // Streaming token from LLM
   | 'AMA_SOURCES' // Sources for answer
   | 'AMA_DONE' // Answer complete
-  | 'AMA_ERROR'; // Error during AMA
+  | 'AMA_ERROR' // Error during AMA
+  | 'sync:checkNativeHost' // Check if native host is available
+  | 'sync:initiatePairing' // Start pairing (generate QR)
+  | 'sync:devicePaired' // Device paired successfully
+  | 'sync:cancelSync' // Cancel sync
+  | 'sync:getSyncStatus'; // Get sync status
 
 export interface BaseMessage {
   type: MessageType;
@@ -149,6 +154,31 @@ export interface PageDigest {
   // Privacy
   isPrivate: boolean;        // User manually marked as private
   autoExpireAt: number;      // Auto-delete timestamp (30 days default)
+  
+  // Cross-Device Sync (v5: optional for backwards compatibility)
+  vectorMetadata?: {         // Vector generation metadata for compatibility checking
+    tfVersion: string;       // TensorFlow.js version (e.g., "4.22.0")
+    useVersion: string;      // USE model version (e.g., "1.3.3")
+    backend: string;         // TF backend used (webgl, cpu, wasm)
+    dimensions: number;      // Vector dimensions (512 for USE)
+    generatedAt: number;     // When vector was generated
+  };
+  syncMetadata?: {           // Sync tracking metadata
+    lastSyncedAt?: number;   // When this page was last synced
+    sourceDevices?: string[]; // Device IDs that contributed to this page
+    mergeCount?: number;     // Number of times this page has been merged
+  };
+  pageId?: string;           // Stable page identifier (for sync deduplication)
+  domain?: string;           // Domain name (for easier filtering)
+  qualityScore?: number;     // Page quality score (0.0-1.0)
+  keywords?: string[];       // Additional keywords
+  activityContext?: {        // Activity tracking context
+    sessionId?: string;
+    tabId?: number;
+    windowId?: number;
+    referrer?: string;
+    duration?: number;
+  };
 }
 
 // Legacy schema for migration

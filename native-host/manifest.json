@@ -1,0 +1,9 @@
+{
+  "name": "com.brainplus.sync_host",
+  "description": "BrainPlus Cross-Device Sync Host",
+  "path": "C:\\learn_dev\\data_tmp\\new_data_era\\native-host\\brainplus-sync-host-wrapper.bat",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://opdefhkmjjojnjofagmbijdgfhjhpnif/"
+  ]
+}
