@@ -102,6 +102,30 @@ export default function SyncView() {
         totalPages: 0,
       });
       
+      // Request native messaging permission if not already granted
+      if (!nativeHostAvailable) {
+        const hasPermission = await chrome.permissions.contains({
+          permissions: ['nativeMessaging']
+        });
+        
+        if (!hasPermission) {
+          const granted = await chrome.permissions.request({
+            permissions: ['nativeMessaging']
+          });
+          
+          if (!granted) {
+            throw new Error('Native messaging permission required for sync');
+          }
+          
+          // Re-check availability after permission granted
+          await checkAvailability();
+          
+          if (!nativeHostAvailable) {
+            throw new Error('Native host not available. Please install BrainPlus Sync Companion.');
+          }
+        }
+      }
+      
       const response = await chrome.runtime.sendMessage({
         type: 'sync:initiatePairing',
       });

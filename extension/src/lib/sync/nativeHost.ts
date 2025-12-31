@@ -33,6 +33,19 @@ export async function checkNativeHostAvailability(): Promise<{
   error?: string;
 }> {
   try {
+    // First check if we have the nativeMessaging permission
+    const hasPermission = await chrome.permissions.contains({
+      permissions: ['nativeMessaging']
+    });
+    
+    if (!hasPermission) {
+      console.log('⚠️ Native messaging permission not granted');
+      return {
+        available: false,
+        error: 'Native messaging permission required',
+      };
+    }
+    
     // Use shorter timeout for availability check (2 seconds)
     const response = await sendNativeMessage({
       type: 'check_availability',
@@ -59,6 +72,30 @@ export async function checkNativeHostAvailability(): Promise<{
       available: false,
       error: error instanceof Error ? error.message : 'Native host not installed',
     };
+  }
+}
+
+/**
+ * Request native messaging permission (must be called from user action)
+ * 
+ * @returns Promise resolving to whether permission was granted
+ */
+export async function requestNativeMessagingPermission(): Promise<boolean> {
+  try {
+    const granted = await chrome.permissions.request({
+      permissions: ['nativeMessaging']
+    });
+    
+    if (granted) {
+      console.log('✅ Native messaging permission granted');
+    } else {
+      console.warn('⚠️ Native messaging permission denied');
+    }
+    
+    return granted;
+  } catch (error) {
+    console.error('❌ Failed to request native messaging permission:', error);
+    return false;
   }
 }
 

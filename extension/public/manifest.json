@@ -32,7 +32,9 @@
     "alarms",
     "offscreen",
     "idle",
-    "tabs",
+    "tabs"
+  ],
+  "optional_permissions": [
     "nativeMessaging"
   ],
   "host_permissions": [
