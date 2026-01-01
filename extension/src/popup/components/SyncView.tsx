@@ -70,8 +70,21 @@ export default function SyncView() {
     return () => clearInterval(interval);
   }, [expiresAt]);
   
-  async function checkAvailability() {
+  async function checkAvailability(requestPermission: boolean = false) {
     try {
+      // Request permission only if called from user gesture (e.g., "Check Again" button)
+      if (requestPermission) {
+        const granted = await chrome.permissions.request({
+          permissions: ['nativeMessaging']
+        });
+        
+        if (!granted) {
+          console.log('Native messaging permission denied');
+          setNativeHostAvailable(false);
+          return;
+        }
+      }
+      
       // Add timeout to prevent hanging
       const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('Check timeout')), 3000)
@@ -92,6 +105,17 @@ export default function SyncView() {
   
   async function handleStartSync() {
     try {
+      // Request native messaging permission FIRST (must be called directly from user gesture)
+      // Chrome will return true immediately if already granted
+      const granted = await chrome.permissions.request({
+        permissions: ['nativeMessaging']
+      });
+      
+      if (!granted) {
+        throw new Error('Native messaging permission is required for sync');
+      }
+      
+      // Now we can do other async operations
       setSyncProgress({
         state: 'pairing',
         progress: 0,
@@ -102,28 +126,11 @@ export default function SyncView() {
         totalPages: 0,
       });
       
-      // Request native messaging permission if not already granted
+      // Re-check availability after permission granted
+      await checkAvailability();
+      
       if (!nativeHostAvailable) {
-        const hasPermission = await chrome.permissions.contains({
-          permissions: ['nativeMessaging']
-        });
-        
-        if (!hasPermission) {
-          const granted = await chrome.permissions.request({
-            permissions: ['nativeMessaging']
-          });
-          
-          if (!granted) {
-            throw new Error('Native messaging permission required for sync');
-          }
-          
-          // Re-check availability after permission granted
-          await checkAvailability();
-          
-          if (!nativeHostAvailable) {
-            throw new Error('Native host not available. Please install BrainPlus Sync Companion.');
-          }
-        }
+        throw new Error('Native host not available. Please install BrainPlus Sync Companion.');
       }
       
       const response = await chrome.runtime.sendMessage({
@@ -285,7 +292,7 @@ export default function SyncView() {
               <li>Restart your browser</li>
             </ol>
           </div>
-          <button style={styles.retryButton} onClick={checkAvailability}>
+          <button style={styles.retryButton} onClick={() => checkAvailability(true)}>
             Check Again
           </button>
         </div>
