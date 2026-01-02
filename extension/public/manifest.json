@@ -32,10 +32,10 @@
     "alarms",
     "offscreen",
     "idle",
-    "tabs"
+    "tabs",
+    "nativeMessaging"
   ],
   "optional_permissions": [
-    "nativeMessaging"
   ],
   "host_permissions": [
     "http://localhost:8000/*",

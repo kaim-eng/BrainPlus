@@ -33,6 +33,15 @@ export async function checkNativeHostAvailability(): Promise<{
   error?: string;
 }> {
   try {
+    // Check if native messaging API is available (Chrome OS may not support it)
+    if (typeof chrome.runtime.connectNative === 'undefined') {
+      console.warn('⚠️ Native messaging API not available on this platform');
+      return {
+        available: false,
+        error: 'Native messaging not supported on this platform (Chrome OS restriction)',
+      };
+    }
+    
     // First check if we have the nativeMessaging permission
     const hasPermission = await chrome.permissions.contains({
       permissions: ['nativeMessaging']

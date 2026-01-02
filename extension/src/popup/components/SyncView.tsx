@@ -284,13 +284,17 @@ export default function SyncView() {
             Sync your browsing history between desktop and mobile devices with end-to-end encryption.
           </p>
           <div style={styles.warning}>
-            <strong>⚠️ Sync Companion Required</strong>
-            <p>To enable sync, install the BrainPlus Sync Companion:</p>
-            <ol style={styles.steps}>
-              <li>Download from <a href="https://brainplus.dev/sync" target="_blank">brainplus.dev/sync</a></li>
-              <li>Run the installer</li>
-              <li>Restart your browser</li>
-            </ol>
+            <strong>⚠️ Sync Not Available</strong>
+            <p>Cross-device sync requires native messaging support, which may not be available on:</p>
+            <ul style={styles.steps}>
+              <li>Chrome OS / Chromebooks</li>
+              <li>Managed/Enterprise Chrome installations</li>
+              <li>Education accounts</li>
+            </ul>
+            <p style={{marginTop: '10px', fontSize: '13px'}}>
+              If you're on Windows/Mac/Linux, install the BrainPlus Sync Companion from{' '}
+              <a href="https://brainplus.dev/sync" target="_blank">brainplus.dev/sync</a>
+            </p>
           </div>
           <button style={styles.retryButton} onClick={() => checkAvailability(true)}>
             Check Again
